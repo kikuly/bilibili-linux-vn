@@ -1,216 +1,137 @@
-**简体中文 | [繁體中文](README_zh-tw.MD) | [English](README_en.MD) | [Tiếng Việt](README_vi.MD)**
+**[简体中文](README.MD) | [繁體中文](README_zh-tw.MD) | [English](README_en.MD) | Tiếng Việt**
 
 <div align="center">
 
   <img src="./res/icons/bilibili.svg" height="100px" width="100px"/>
 
-  <h3>哔哩哔哩 Linux版</h3>
+  <h3>Bilibili cho Linux / Windows — Bản tiếng Việt</h3>
   <br>
 
 ----
 
-[![aur](https://img.shields.io/aur/version/bilibili-bin)](https://aur.archlinux.org/packages/bilibili-bin)
+  Ứng dụng Bilibili trên máy tính với **giao diện tiếng Việt** và **phụ đề tiếng Việt dịch tự động**.
 
-  这是哔哩哔哩 Linux版
-  
-  SVG图标来自 [@Peternal](https://github.com/Peternal)
+  Đây là bản fork của dự án gốc [msojocs/bilibili-linux](https://github.com/msojocs/bilibili-linux). Biểu tượng SVG của [@Peternal](https://github.com/Peternal).
 
   <br>
 </div>
 
-## 介绍
+> [!NOTE]
+> Dự án gốc: **https://github.com/msojocs/bilibili-linux** — toàn bộ phần lõi (vá client chính thức, roaming, SponsorBlock, ...) là công sức của tác giả gốc. Bản này chỉ bổ sung tiếng Việt. Các hướng dẫn nâng cao (tăng tốc GPU, Loongson, ...) xem trong [README tiếng Anh](README_en.MD) của dự án gốc.
 
-本项目用到了：
+## Điểm khác so với bản gốc
 
-1. 反混淆
-2. 调试
-3. 脑子
+1. **Giao diện tiếng Việt** (mặc định ở lần chạy đầu tiên): hơn 500 chuỗi và các mẫu câu có tham số (thời gian, số lượt thích/người theo dõi, chất lượng video, ...) trong [`src/extension/common/translation/vi.ts`](src/extension/common/translation/vi.ts), cùng bảng cài đặt tiện ích ở [`src/extension/ui/locales/vi.ts`](src/extension/ui/locales/vi.ts).
+2. **Phụ đề tiếng Việt dịch tự động**: mỗi video có phụ đề sẽ có thêm mục **"Tiếng Việt (tự động)"** trong menu phụ đề của trình phát. Dịch bằng Google Translate, có thể dùng cho cả chế độ phụ đề song ngữ.
+3. **Hiển thị đúng dấu tiếng Việt**: dùng bộ font hỗ trợ đầy đủ dấu (Segoe UI, Roboto, Noto Sans, DejaVu Sans, ...), loại trừ phông icon và danmaku để không làm hỏng giao diện.
+4. **Sửa bố cục khi chữ dài hơn tiếng Trung**: bảng cài đặt phụ đề, bảng cài đặt danmaku, hộp thoại điều khoản (trước đây nút "Đồng ý" bị tràn ra ngoài khung và không bấm được), nút gửi danmaku, ...
+5. **Sửa phụ đề cho client 1.19**: trình phát mới lấy danh sách phụ đề bằng protobuf (`x/v2/subtitle/web/view`), nên bản này chèn thêm track vào đúng endpoint đó.
 
-本项目完全开源，且没有任何代码加密操作，如有疑虑请自行审查代码或停止使用相关文件。
+Vẫn giữ nguyên các tính năng của bản gốc: không có thanh tiêu đề khó chịu, hỗ trợ toàn màn hình cho màn hình độ phân giải thấp, kiểm tra cập nhật, menu thoát ứng dụng, roaming, tìm kiếm ở khu vực khác, [chia sẻ danmaku](docs/help/弹幕共享.MD) (tiếng Trung), SponsorBlock, ...
 
-## 特点
+## Ảnh chụp
 
-1. 没有讨厌的标题栏
-2. 支持小分辨率屏幕全屏
-3. 检查更新支持
-4. 有能够关闭程序的菜单
-5. 支持漫游
-6. 外区搜索
-7. [弹幕共享](docs/help/弹幕共享.MD)
+| Trang chủ | Phụ đề tiếng Việt |
+|---|---|
+| ![Trang chủ](docs/images/vi/01-trang-chu.jpg) | ![Phụ đề tiếng Việt](docs/images/vi/02-phu-de-tieng-viet.jpg) |
 
-## 使用方法
+| Cài đặt phụ đề | Cài đặt danmaku |
+|---|---|
+| ![Cài đặt phụ đề](docs/images/vi/03-cai-dat-phu-de.jpg) | ![Cài đặt danmaku](docs/images/vi/04-cai-dat-danmaku.jpg) |
 
-### 自动化构建
+![Cài đặt tiện ích](docs/images/vi/05-cai-dat-tien-ich.jpg)
 
-请到 Release 页面下载：
+## Cách sử dụng
 
-https://github.com/msojocs/bilibili-linux/releases
+### Tải bản dựng sẵn
 
-即时构建版本：
+Tải ở trang Release: **https://github.com/kikuly/bilibili-linux-vn/releases**
 
-https://github.com/msojocs/bilibili-linux/releases/tag/continuous
+| Hệ điều hành | Tệp | Ghi chú |
+|---|---|---|
+| Windows x64 | `bilibili-vi-1.19.0-x64.exe` | Trình cài đặt NSIS, cho phép chọn thư mục cài. Tệp chưa được ký số nên Windows SmartScreen có thể cảnh báo ("More info" → "Run anyway"). |
+| Linux x64 (AppImage) | `bilibili-vi-1.19.0-x86_64.AppImage` | Chạy trực tiếp trên hầu hết các bản phân phối. Cần quyền thực thi; nếu thiếu FUSE thì chạy với `--appimage-extract-and-run`. |
+| Linux x64 (rpm) | `bilibili-vi-1.19.0.x86_64.rpm` | Cho Fedora, openSUSE và các bản phân phối dùng rpm; cài vào `/opt/bilibili`. |
+| Linux x64 (tar.gz) | `bilibili-v1.19.0-vi.1-x64.tar.gz` | Giải nén rồi chạy `bin/bilibili`. Đã gồm sẵn Electron 43.1.1. |
 
-### 手动构建
-
-1. 拉取代码
-   ```
-   git clone https://github.com/msojocs/bilibili-linux.git
-   cd bilibili-linux
-   ```
-2. 安装
-   ```
-   tools/setup-bilibili.sh
-   ```
-3. 启动
-   ```
-   bin/bilibili
-   ```
-### AppImage 安装
-
-请使用 [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher)
-
-## Gentoo Linux
-
-Emerge from [gentoo-zh overlay](https://github.com/microcai/gentoo-zh/tree/master/media-video/bilibili).
-
-### 额外补充
-
-如果阁下不喜欢电脑多装一个 Electron，可以自行提取发布版的 `app.asar` 并使用已安装 Electron 启动，建议的 Electron 版本是：`43.1.1`（`VaapiOnNvidiaGPUs` 需要 Electron 43+ / Chromium 130+）
-
-## GPU 加速配置
-
-Electron 43 (Chromium 150) 支持 Linux 下 VA-API 硬件视频解码。以下为推荐配置：
-
-### NVIDIA GPU
-
-1. 安装 VA-API → NVDEC 后端：
-   ```bash
-   # Arch Linux
-   sudo pacman -S libva-nvidia-driver
-   # Debian/Ubuntu
-   sudo apt install libva-nvidia-driver
-   ```
-
-2. 设置环境变量（libva 需要此变量定位 NVIDIA 后端）：
-   ```bash
-   export LIBVA_DRIVER_NAME=nvidia
-   ```
-
-3. 在 `~/.config/bilibili/bilibili-flags.conf` 中配置：
-
-   ```
-   --ignore-gpu-blocklist
-   --enable-features=AcceleratedVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL,VaapiOnNvidiaGPUs,VaapiIgnoreDriverChecks,PlatformHEVCDecoderSupport
-   --enable-gpu-rasterization
-   --enable-zero-copy
-   --disable-gpu-sandbox
-   ```
-
-   > **说明**：
-   > - `VaapiOnNvidiaGPUs` (Chromium 130+) 绕过 vaapi_wrapper 对 NVIDIA 设备的跳过检查
-   > - `AcceleratedVideoDecodeLinuxGL` / `AcceleratedVideoDecodeLinuxZeroCopyGL` 为 Chromium 150 推荐的 GL 零拷贝解码路径
-   > - Electron 28 不支持以上 feature，NVIDIA 视频硬解需要 Electron 43+
-
-### Intel / AMD GPU
-
-```
---ignore-gpu-blocklist
---enable-features=AcceleratedVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL,VaapiVideoDecoder,VaapiIgnoreDriverChecks,PlatformHEVCDecoderSupport
---enable-gpu-rasterization
---enable-zero-copy
---disable-gpu-sandbox
-```
-
-Intel 核显与 AMD 独显/核显使用 Mesa VA-API 后端，无需额外安装驱动或设置环境变量。
-
-### 验证硬解
-
-播放视频后检查 GPU 解码引擎是否工作：
+Linux:
 
 ```bash
-cat /proc/$(pgrep -f "type=gpu-process.*bilibili")/fdinfo/* | grep drm-engine-video
+# AppImage
+chmod +x bilibili-vi-1.19.0-x86_64.AppImage
+./bilibili-vi-1.19.0-x86_64.AppImage
+
+# rpm (Fedora, openSUSE, ...)
+sudo dnf install ./bilibili-vi-1.19.0.x86_64.rpm
+
+# hoặc dùng tar.gz
+tar xzf bilibili-v1.19.0-vi.1-x64.tar.gz
+./bin/bilibili
 ```
 
-非零数值表示 GPU 解码引擎正在工作。也可访问 `chrome://gpu` 查看 "Video Decode" 状态。
+> Bản Windows đã được chạy thử. Các gói Linux được dựng trong container Linux và mới chỉ kiểm tra được ở mức giải nén và khởi chạy mã của ứng dụng; **chưa được chạy thử có giao diện trên máy Linux thật**. Nếu gặp lỗi xin mở issue.
 
-### 注意
+Nếu không muốn cài thêm một bản Electron, có thể lấy `app/app.asar` trong gói Linux và chạy bằng Electron đã có sẵn (khuyến nghị `43.1.1`).
 
-- `--use-gl=angle --use-angle=gl` 在部分 Linux 桌面环境（尤其是 Wayland）下可能导致 VA-API 解码失效，建议使用 Electron 默认的 EGL/GLX 后端。
-- 如果系统开启了代理（如 Clash），`bilipc.bilibili.com` 经代理可能无法解析导致白屏。Electron 43+ 版本已内置代理绕过处理。
+### Tự build
 
-## 开发者工具
+Linux (theo dự án gốc):
 
-### F12 开发者面板
+```bash
+git clone https://github.com/kikuly/bilibili-linux-vn.git
+cd bilibili-linux-vn
+tools/setup-bilibili.sh
+bin/bilibili
+```
 
-现已支持自行打开开发者工具，方法如下：
+Windows: các script trong `tools/` là bash, cần Git Bash. Tóm tắt các bước đã dùng để dựng bản `.exe`:
 
-现已支持自行打开开发者工具，方法如下：
+1. Tải bộ cài chính thức `https://dl.hdslb.com/mobile/fixed/bili_win/bili_win-install.exe` (phiên bản phải khớp `conf/bilibili_version`) và giải nén thư mục `resources` (cần 7-Zip bản đầy đủ vì đây là bộ cài NSIS).
+2. Chạy `tools/fix-other.sh` (giải mã và vá `app.asar`, bỏ qua bước `cursor-tool` vì chỉ dùng cho Linux) rồi `tools/extension.sh` (build tiện ích mở rộng và nhét vào `app.asar`).
+3. Chạy `electron-builder --win --x64 -c conf/build.json -c.electronVersion=43.1.1` để tạo bộ cài.
 
-尝试按下<kbd>F12</kbd>，如果没有反应就是没有开启；
+## Dùng phụ đề tiếng Việt
 
-登录界面有两层，内层右键打开，外层<kbd>F12</kbd>打开。
+1. Mở một video có phụ đề (kể cả phụ đề AI của Bilibili; cần đăng nhập thì Bilibili mới trả về danh sách phụ đề).
+2. Di chuột vào nút **Phụ đề** ở thanh điều khiển và chọn **Tiếng Việt (tự động)**.
+3. Lần đầu bật ở mỗi video cần chờ vài giây để dịch; các lần sau dùng bản dịch đã lưu (IndexedDB, giữ 30 ngày).
 
-## 关于龙芯
+Lưu ý:
 
-https://areweloongyet.com/docs/loong-or-loongarch
+- **Nội dung phụ đề được gửi tới Google Translate** (endpoint không chính thức `clients5.google.com/translate_a/t`) để dịch. Không bật tính năng này nếu bạn không muốn vậy.
+- Endpoint không chính thức có thể bị Google giới hạn hoặc thay đổi bất cứ lúc nào; khi dịch lỗi, trình phát sẽ hiện phụ đề gốc.
+- Mỗi dòng phụ đề được dịch riêng, không có ngữ cảnh xung quanh nên câu bị ngắt giữa hai dòng có thể chưa mượt.
+- Video không có phụ đề nào thì không có gì để dịch.
 
-|发行版|架构标识符|
-|------|----------|
-|AOSC OS|`loongarch64`|
-|Debian|<ul><li>旧世界：`loongarch64`</li><li>新世界：`loong64`</li></ul>|
-|Gentoo|`loong`|
-|Loong Arch Linux|`loong64`|
-|RPM 系|`loongarch64`|
-|Slackware|`loong64`|
+## Đổi ngôn ngữ giao diện
 
-## 空降助手
+1. Nhấn nút cài đặt ở góc dưới bên phải trang chủ.
+2. Chọn **Cài đặt khác**.
+3. Chọn ngôn ngữ ở mục **Ngôn ngữ**: 中文 / English / Tiếng Việt.
 
-自动帮助阁下空降至关键位置。
+Quy ước bảo trì bản dịch xem ở [docs/Translation.md](docs/Translation.md). Những chuỗi nằm ngoài từ điển (tiêu đề video, tên UP, danh mục mới của Bilibili, ...) vẫn giữ nguyên tiếng Trung. Muốn bổ sung bản dịch, sửa `src/extension/common/translation/vi.ts` (và `en.ts` để hai bản luôn khớp khóa).
 
-你需要提前安装`python3`软件包与`faster_whisper` `torch`模块。
+## Công cụ cho nhà phát triển
 
-参考文档：[AiTranscribe](docs/AiTranscribe.MD)
+Nhấn <kbd>F12</kbd> để mở bảng công cụ nhà phát triển; nếu không có phản ứng thì tính năng này chưa được bật. Giao diện đăng nhập có hai lớp: chuột phải để mở lớp trong, <kbd>F12</kbd> cho lớp ngoài.
 
-| 选项 | 说明 |
-|------|-----|
-| Whisper代理 | 模型下载需要代理, 形如：`http://127.0.0.1:1080` |
-| LD_LIBRARY_PATH | 可能遇到 `cudnn` 库找不到，[参考此处](https://github.com/MahmoudAshraf97/whisper-diarization/issues/259) |
-| AI识别TOKEN | https://www.bigmodel.cn/ 的Token，使用免费模型 `glm-4.5-flash` |
+## Lịch sử thay đổi
 
-## 切换语言
+[CHANGELOG.MD](CHANGELOG.MD)
 
-1. 在主页点击右下角设定按钮
-2. 进入“其它设定”
-3. 在“语言设定”区域选择你想要的语言
+## Cảm ơn các dự án
 
-## 更新日志
+1. [msojocs/bilibili-linux](https://github.com/msojocs/bilibili-linux) — dự án gốc
+2. [BiliRoaming](https://github.com/yujincheng08/BiliRoaming)
+3. [bilibili-helper](https://github.com/ipcjs/bilibili-helper)
+4. [BilibiliSponsorBlock](https://github.com/hanydd/BilibiliSponsorBlock)
 
-[CHANGELOG.md](CHANGELOG.md)
+## Tuyên bố miễn trừ
 
-## 预览
+Giấy phép (MIT) chỉ áp dụng cho mã nguồn của dự án này, không áp dụng cho sản phẩm của Bilibili.
 
-![推荐](res/screenshots/1.png)
+Bản quyền client Bilibili thuộc về Shanghai Kuanyu Digital Technology Co., Ltd.
 
-![直播](res/screenshots/live.png)
+Người duy trì không chịu trách nhiệm về bất kỳ sự cố phát sinh nào khi sử dụng dự án, chẳng hạn bị khóa hoặc mất tài khoản. Hãy cân nhắc trước khi dùng.
 
-![检查更新](res/screenshots/update.png)
-
-![退出](res/screenshots/exit.png)
-
-![漫游](res/screenshots/roaming.png)
-
-## 感谢以下项目
-
-1. [BiliRoaming](https://github.com/yujincheng08/BiliRoaming)
-2. [解除B站区域限制](https://github.com/ipcjs/bilibili-helper)
-3. [小电视空降助手](https://github.com/hanydd/BilibiliSponsorBlock)
-
-## 免责声明
-
-License 仅对本项目生效，不针对其产物。
-
-哔哩哔哩客户端版权归上海宽娱数码科技有限公司所有；
-
-对于使用本项目产生的额外问题，如账户封禁被盗等，维护者不对此负责，请谨慎使用；
-
-如有不当之处，请联系本人，邮箱：jiyecafe@gmail.com
+Mọi vấn đề về dự án gốc xin liên hệ tác giả gốc: jiyecafe@gmail.com
