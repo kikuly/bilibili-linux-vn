@@ -5,6 +5,7 @@ import { CustomIndexedDB } from "../common/db";
 import type { BiliPlayUrlResult } from "../common/interface/bili-playurl/playurl.type";
 import { createLogger } from "../../common/log";
 import { getSegments } from "../common/sponsor-block";
+import { addSubtitleTracks, type NewSubtitleTrack } from "../common/subtitle-protobuf";
 import { translateSubtitle } from "../common/subtitle-translate";
 import type { BiliResponseData, BiliResponseResult, BiliSeasonInfoType } from "../common/types";
 import { UTILS } from "../common/utils";
@@ -224,6 +225,9 @@ const AREA_MARK_CACHE: Record<string, AreaType> = {}
 type SubtitleInfo = { lan: string, subtitle_url: string }
 // 已注册的翻译字幕拦截地址
 const SUBTITLE_TRANSLATE_KEYS = new Set<string>()
+const SUBTITLE_VIEW_KEYS = new Set<string>()
+// 机翻时选择源字幕的优先级
+const TRANSLATE_SOURCE_ORDER = ['zh-Hans', 'zh-Hant', 'ai-zh', 'en', 'ai-en']
 
 export const ResponseReplaceXMLHttpRequest = {
 
@@ -668,7 +672,7 @@ export const ResponseReplaceXMLHttpRequest = {
     const findSubtitle = (lan: string) => subtitles.find(e => e.lan === lan && e.subtitle_url)
     // 越南语机翻，优先用原始中文字幕作为源
     const viSource = findSubtitle('vi') ? undefined
-      : ['zh-Hans', 'zh-Hant', 'ai-zh', 'en', 'ai-en'].map(findSubtitle).find(e => e) || subtitles.find(e => e.subtitle_url)
+      : TRANSLATE_SOURCE_ORDER.map(findSubtitle).find(e => e) || subtitles.find(e => e.subtitle_url)
     // 查找简体
     if (!findSubtitle('zh-Hans')) {
       // 没有简体，查找繁体
@@ -679,7 +683,7 @@ export const ResponseReplaceXMLHttpRequest = {
       }
     }
     if (viSource) {
-      addTranslatedSubtitle(viSource, 'vi', 'Tiếng Việt (dịch tự động)', 1145141919811)
+      addTranslatedSubtitle(viSource, 'vi', 'Tiếng Việt (tự động)', 1145141919811)
     }
     document.dispatchEvent(new CustomEvent('sponsorblock.showAiAnalysis', { detail: false }))
     // SponsorBlock
@@ -712,6 +716,45 @@ export const ResponseReplaceXMLHttpRequest = {
     }
     // log.info('subtitle result:', resp)
     req.responseText = JSON.stringify(resp)
+  },
+
+  /**
+   * 字幕列表（protobuf），新版播放器从这里取字幕列表，追加简体/越南语机翻字幕轨
+   * @param {XMLHttpRequest} req 原请求结果
+   * @returns {Promise<void>}
+   */
+  "//api.bilibili.com/x/v2/subtitle/web/view": async (req: CustomXMLHttpRequest) => {
+    const buffer = req.response
+    if (!(buffer instanceof ArrayBuffer)) return
+    try {
+      const result = addSubtitleTracks(buffer, tracks => {
+        const indexOf = (lan: string) => tracks.findIndex(e => e.lan === lan && e.url)
+        const plan: NewSubtitleTrack[] = []
+        const zhHant = indexOf('zh-Hant')
+        if (indexOf('zh-Hans') < 0 && zhHant >= 0) {
+          plan.push({ id: 1145141919810, lan: 'zh-Hans', lanDoc: '中文（简体）', source: zhHant })
+        }
+        if (indexOf('vi') < 0) {
+          const source = TRANSLATE_SOURCE_ORDER.map(lan => indexOf(lan)).find(i => i >= 0) ?? tracks.findIndex(e => e.url)
+          if (source >= 0) plan.push({ id: 1145141919811, lan: 'vi', lanDoc: 'Tiếng Việt (tự động)', source })
+        }
+        return plan
+      })
+      // 没有追加（含重复调用时已追加过）则保留原有拦截规则
+      if (!result) return
+      for (const key of SUBTITLE_VIEW_KEYS) {
+        delete (ResponseReplaceXMLHttpRequest as any)[key]
+      }
+      SUBTITLE_VIEW_KEYS.clear()
+      for (const { url } of result.added) {
+        const key = url.split('?')[0];
+        (ResponseReplaceXMLHttpRequest as any)[key] = ResponseReplaceXMLHttpRequest.translatedSubtitle
+        SUBTITLE_VIEW_KEYS.add(key)
+      }
+      req.response = result.buffer
+    } catch (err) {
+      log.error('字幕列表处理失败:', err)
+    }
   },
 
   /**
