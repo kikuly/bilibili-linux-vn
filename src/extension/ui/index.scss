@@ -95,6 +95,62 @@ body[lang="vi"] {
     }
   }
 }
+// 播放器里固定尺寸的设置面板：译文变长后文字会互相覆盖，改为按内容自适应
+// （!important 是为了盖过播放器写在行内/高优先级里的固定宽高）
+body[lang="en"],
+body[lang="vi"] {
+  // 字幕设置
+  .bpx-player-ctrl-subtitle-menu {
+    height: auto !important;
+
+    .bui-panel-wrap,
+    .bui-panel-item {
+      height: auto !important;
+      min-height: 260px;
+    }
+  }
+
+  .bpx-player-ctrl-subtitle-other-content {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+    height: auto !important;
+  }
+
+  .bpx-player-ctrl-subtitle-fade {
+    margin-left: 0 !important;
+  }
+
+  // 弹幕设置（单列布局由 page/translation/player-layout.ts 开启）
+  .bpx-player-dm-setting-i18n-view {
+    // 播放器的单列布局会把容器宽高设成 auto，容器塌成 0x0 后鼠标悬停区域失效，面板可能收不回去，固定回原尺寸
+    height: 359px !important;
+    width: 320px !important;
+
+    .bpx-player-dm-setting-box,
+    .bpx-player-dm-setting-box .bui-area,
+    .bui-panel-wrap,
+    .bui-panel-move,
+    .bui-panel-item {
+      height: auto !important;
+    }
+  }
+
+  // “恢复默认设置”按钮
+  .bpx-player-ctrl-subtitle-reset,
+  .bpx-player-dm-setting-right-reset {
+    height: auto !important;
+    min-width: 116px;
+    width: auto !important;
+
+    .bui-area {
+      height: auto !important;
+      padding: 3px 6px;
+      white-space: normal;
+      width: auto !important;
+    }
+  }
+}
 body[lang="vi"] {
   .app_video--detail-unfold:after {
     content: 'Mở rộng';

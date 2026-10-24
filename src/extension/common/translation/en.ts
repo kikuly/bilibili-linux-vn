@@ -508,6 +508,19 @@ export const enSimple: Record<string, string> = {
   'UP主觉得很赞': 'The UP thinks it\'s great',
   '笔记': 'Notes',
   '其他设置': 'Other Settings',
+  '已关闭弹幕': 'Danmaku off',
+  '按类型过滤': 'Filter by Type',
+  '中文': 'Chinese',
+  '视频选集': 'Episodes',
+  '下一个 (])': 'Next (])',
+  '本视频开启原声翻译时不支持关闭字幕': 'Subtitles cannot be turned off while original-voice translation is on',
+  '720P 准高清': '720P Near HD',
+  '480P 标清': '480P SD',
+  '成为大会员': 'Become a Premium Member',
+  '了解更多权益': 'Learn more about benefits',
+  '分享': 'Share',
+  '其它设置': 'Other Settings',
+  '字幕样式测试': 'Subtitle style test',
   '高能进度条': 'High Energy Progress Bar',
   '播放卡顿，试试切换到': 'Network lagging, try switching to',
   '颜文字': 'Emoticons',
@@ -516,6 +529,7 @@ export const enSimple: Record<string, string> = {
 
 const compactNumber = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 2 })
 const formatWan = (value: string) => compactNumber.format(Number(value) * 10000)
+const formatCount = (value: string) => (value.endsWith('万') ? formatWan(value.slice(0, -1)) : value)
 
 export const enRules: readonly TranslationRule[] = [
   { pattern: /^客户端缓存（已缓存：(?<size>\d+(?:\.\d+)?) MB）$/, translation: 'Client cache (Cached: {size} MB)' },
@@ -532,6 +546,25 @@ export const enRules: readonly TranslationRule[] = [
     pattern: /^(?<fans>\d+(?:\.\d+)?)万粉丝 · (?<likes>\d+(?:\.\d+)?)万点赞$/,
     translation: ({ fans, likes }) => `${formatWan(fans)} fans · ${formatWan(likes)} likes`,
   },
+  { pattern: /^(?<count>\d+(?:\.\d+)?)万点赞$/, translation: ({ count }) => `${formatWan(count)} likes` },
+  { pattern: /^(?<count>\d+(?:\.\d+)?)万粉丝$/, translation: ({ count }) => `${formatWan(count)} fans` },
+  {
+    pattern: /^自动\((?<quality>\d+P\+?) (?<name>高清|准高清|标清|流畅|清晰)\)$/,
+    translation: ({ quality, name }) => `Auto (${quality} ${({ 高清: 'HD', 准高清: 'Near HD', 标清: 'SD', 流畅: 'Smooth', 清晰: 'Clear' } as Record<string, string>)[name]})`,
+  },
+  { pattern: /^昨天 (?<time>\d{2}:\d{2}) · 投稿了视频$/, translation: 'Yesterday {time} · posted a video' },
+  { pattern: /^昨天 (?<time>\d{2}:\d{2})$/, translation: 'Yesterday {time}' },
+  { pattern: /^今天 (?<time>\d{2}:\d{2}) · 投稿了视频$/, translation: 'Today {time} · posted a video' },
+  { pattern: /^今天 (?<time>\d{2}:\d{2})$/, translation: 'Today {time}' },
+  { pattern: /^(?<count>\d+)天前 · 投稿了视频$/, translation: '{count} days ago · posted a video' },
+  { pattern: /^(?<count>\d+)天前$/, translation: '{count} days ago' },
+  {
+    pattern: /^(?<fans>\d+(?:\.\d+)?万?)粉丝 · (?<likes>\d+(?:\.\d+)?万?)点赞$/,
+    translation: ({ fans, likes }) => `${formatCount(fans)} fans · ${formatCount(likes)} likes`,
+  },
+  { pattern: /^字幕已切换至 (?<language>.+)$/, translation: ({ language }) => `Subtitles switched to ${({ 中文: 'Chinese' } as Record<string, string>)[language] ?? language}` },
+  { pattern: /^(?<count>\d+)点赞$/, translation: '{count} likes' },
+  { pattern: /^(?<count>\d+)粉丝$/, translation: '{count} fans' },
   { pattern: /^(?<count>\d+(?:\.\d+)?)万$/, translation: ({ count }) => formatWan(count) },
   { pattern: /^推荐音频码率：(?<rate>\d+)kbps$/, translation: 'Recommended audio bitrate: {rate}kbps' },
   { pattern: /^音频采样率(?<rate>\d+)Hz$/, translation: 'Audio sampling rate {rate}Hz' },
