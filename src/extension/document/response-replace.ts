@@ -5,6 +5,7 @@ import { CustomIndexedDB } from "../common/db";
 import type { BiliPlayUrlResult } from "../common/interface/bili-playurl/playurl.type";
 import { createLogger } from "../../common/log";
 import { getSegments } from "../common/sponsor-block";
+import { translateSubtitle } from "../common/subtitle-translate";
 import type { BiliResponseData, BiliResponseResult, BiliSeasonInfoType } from "../common/types";
 import { UTILS } from "../common/utils";
 import type { FetchReplaceType } from "./types";
@@ -220,6 +221,9 @@ const uposMap: Record<string, string> = {
   akamai: 'upos-hz-mirrorakam.akamaized.net',
 };
 const AREA_MARK_CACHE: Record<string, AreaType> = {}
+type SubtitleInfo = { lan: string, subtitle_url: string }
+// 已注册的翻译字幕拦截地址
+const SUBTITLE_TRANSLATE_KEYS = new Set<string>()
 
 export const ResponseReplaceXMLHttpRequest = {
 
@@ -641,27 +645,41 @@ export const ResponseReplaceXMLHttpRequest = {
       }
     }
     // 删除旧的规则
-    for (const key in ResponseReplaceXMLHttpRequest) {
-      if (key && key.endsWith('json.translate')) {
-        delete (ResponseReplaceXMLHttpRequest as any)[key]
-      }
+    for (const key of SUBTITLE_TRANSLATE_KEYS) {
+      delete (ResponseReplaceXMLHttpRequest as any)[key]
     }
+    SUBTITLE_TRANSLATE_KEYS.clear()
+    const subtitles: SubtitleInfo[] = resp.data?.subtitle?.subtitles || []
+    /**
+     * 基于已有字幕构造翻译字幕，并注册拦截器
+     */
+    const addTranslatedSubtitle = (source: SubtitleInfo, lan: string, lanDoc: string, id: number) => {
+      const target = JSON.parse(JSON.stringify(source))
+      target.lan = lan
+      target.lan_doc = lanDoc
+      target.id = id
+      target.id_str = `${id}`
+      target.subtitle_url = `${target.subtitle_url}${target.subtitle_url.includes('?') ? '&' : '?'}translate=${lan}`
+      const key = target.subtitle_url.split('?')[0];
+      (ResponseReplaceXMLHttpRequest as any)[key] = ResponseReplaceXMLHttpRequest.translatedSubtitle
+      SUBTITLE_TRANSLATE_KEYS.add(key)
+      subtitles.push(target)
+    }
+    const findSubtitle = (lan: string) => subtitles.find(e => e.lan === lan && e.subtitle_url)
+    // 越南语机翻，优先用原始中文字幕作为源
+    const viSource = findSubtitle('vi') ? undefined
+      : ['zh-Hans', 'zh-Hant', 'ai-zh', 'en', 'ai-en'].map(findSubtitle).find(e => e) || subtitles.find(e => e.subtitle_url)
     // 查找简体
-    const zhHans = resp.data?.subtitle?.subtitles?.find((e: { lan: string; }) => e.lan === 'zh-Hans')
-    if (!zhHans) {
+    if (!findSubtitle('zh-Hans')) {
       // 没有简体，查找繁体
-      const zhHant = resp.data?.subtitle?.subtitles?.find((e: { lan: string; }) => e.lan === 'zh-Hant')
+      const zhHant = findSubtitle('zh-Hant')
       if (zhHant) {
         // 有繁体，构造简体拦截器
-        const zhHans = JSON.parse(JSON.stringify(zhHant))
-        zhHans.lan = 'zh-Hans'
-        zhHans.lan_doc = '中文（简体）'
-        zhHans.id = 1145141919810
-        zhHans.id_str = `${zhHans.id}`
-        zhHans.subtitle_url = `${zhHans.subtitle_url}&translate=zh-Hans`;
-        (ResponseReplaceXMLHttpRequest as any)[zhHans.subtitle_url.split('?')[0]] = ResponseReplaceXMLHttpRequest.zhHansSubtitle
-        resp.data.subtitle.subtitles.push(zhHans)
+        addTranslatedSubtitle(zhHant, 'zh-Hans', '中文（简体）', 1145141919810)
       }
+    }
+    if (viSource) {
+      addTranslatedSubtitle(viSource, 'vi', 'Tiếng Việt (dịch tự động)', 1145141919811)
     }
     document.dispatchEvent(new CustomEvent('sponsorblock.showAiAnalysis', { detail: false }))
     // SponsorBlock
@@ -711,6 +729,34 @@ export const ResponseReplaceXMLHttpRequest = {
       req.status = 200
       // log.info('中文字幕数据: ', req.responseText)
     }
+  },
+
+  /**
+   * 字幕机翻（Google翻译）
+   * @param {XMLHttpRequest} req 原请求结果
+   * @returns {Promise<void>}
+   */
+  viSubtitle: async (req: CustomXMLHttpRequest) => {
+    if (!req.responseText) return
+    try {
+      req.responseText = await translateSubtitle(req.responseURL.split('?')[0], req.responseText, 'vi')
+      req.response = JSON.parse(req.responseText)
+      req.status = 200
+    } catch (err) {
+      // 翻译失败则显示原字幕
+      log.error('字幕翻译失败:', err)
+    }
+  },
+
+  /**
+   * 翻译字幕分发（同一源字幕可能同时生成多个翻译字幕，共用一个拦截地址）
+   * @param {XMLHttpRequest} req 原请求结果
+   * @returns {Promise<void>}
+   */
+  translatedSubtitle: async (req: CustomXMLHttpRequest): Promise<void> => {
+    const translate = new URLSearchParams(req._params || '').get('translate')
+    if (translate === 'zh-Hans') await ResponseReplaceXMLHttpRequest.zhHansSubtitle(req)
+    else if (translate === 'vi') await ResponseReplaceXMLHttpRequest.viSubtitle(req)
   },
 }
 
