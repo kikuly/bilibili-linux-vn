@@ -1,7 +1,7 @@
 > [!NOTE]
 > 本檔案由 AI 產生
 
-**[简体中文](README.MD) | 繁體中文 | [English](README_en.MD)**
+**[简体中文](README.MD) | 繁體中文 | [English](README_en.MD) | [Tiếng Việt](README_vi.MD)**
 
 <div align="center">
 

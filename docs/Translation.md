@@ -1,7 +1,29 @@
 # Translation Maintenance
 
-The extension supports `zh-CN` and `en`. Stored `zhCn` values are normalized to
-`zh-CN` when read. Unsupported language values fall back to Chinese.
+The extension supports `zh-CN`, `en` and `vi`. Stored `zhCn` values are normalized to
+`zh-CN` when read. Unsupported language values fall back to Chinese. When no language
+has ever been stored, `firstRunLanguage` (`vi`, in `common/translation/language.ts`)
+is used.
+
+## Vietnamese (`vi`)
+
+Vietnamese lives next to English and must stay in sync with it: `common/translation/vi.ts`
+has the same exact-match keys and the same dynamic rules (same patterns, same order,
+same `{placeholders}`) as `en.ts`, and `ui/locales/vi.ts` has the same keys as
+`ui/locales/en.ts`. When you add a string to one, add it to the other.
+
+- Vietnamese text is longer than Chinese. Prefer short labels for fixed-size controls
+  (for example position names such as `Giữa dưới`), and fix remaining overlaps in
+  `src/extension/ui/index.scss` under `body[lang="vi"]`.
+- `page/translation/player-layout.ts` adds the player's own single-column class
+  (`bpx-player-dm-setting-i18n-view`) to the danmaku settings panel for non-Chinese
+  languages. That class makes the hover container `auto`-sized, which collapses it to
+  0x0, so `index.scss` pins it back to its original size.
+- The font stack for `body[lang="vi"]` and the Ant Design theme includes fonts with full
+  Vietnamese diacritics. Icon fonts and danmaku are excluded on purpose.
+- Machine-translated subtitles (`common/subtitle-translate.ts`, `common/subtitle-protobuf.ts`)
+  are unrelated to this dictionary: they add a `vi` subtitle track and translate its
+  content with Google Translate, cached in IndexedDB.
 
 ## Language State
 
