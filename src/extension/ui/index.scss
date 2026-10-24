@@ -75,6 +75,26 @@ body[lang="vi"] {
     width: 418px;
   }
 }
+// 协议弹窗高度固定为 500px，译文变长后底部的“同意/不同意”按钮会溢出弹窗而无法点击，
+// 改为内容区滚动，头部和底部按钮固定
+body[lang="en"],
+body[lang="vi"] {
+  .privacy_policy_dialog {
+    display: flex;
+    flex-direction: column;
+
+    .privacy_policy_dialog--header,
+    .privacy_policy_dialog--footer {
+      flex: 0 0 auto;
+    }
+
+    .privacy_policy_dialog--content {
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-y: auto;
+    }
+  }
+}
 body[lang="vi"] {
   .app_video--detail-unfold:after {
     content: 'Mở rộng';
