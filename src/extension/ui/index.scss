@@ -1,4 +1,18 @@
-body[lang="en"] {
+// 越南语使用带完整变音符号的字体，避免中文字体缺字导致方块或符号错位
+// 用 :where 保持低优先级，且排除图标字体、代码、弹幕（弹幕字体由播放器设置控制）
+$vi-font-family: 'Segoe UI', 'Helvetica Neue', Roboto, 'Noto Sans', 'DejaVu Sans', 'Liberation Sans', Arial, 'PingFang SC', 'Microsoft YaHei', 'Noto Sans CJK SC', 'WenQuanYi Micro Hei', sans-serif;
+
+body[lang="vi"] {
+  font-family: $vi-font-family;
+
+  *:where(:not(i, svg, svg *, code, pre, [class*='icon' i], [class*='danmaku' i], [class*='danmaku' i] *)) {
+    font-family: $vi-font-family;
+  }
+}
+
+// 英语/越南语文本比中文长，需要加宽部分固定宽度的控件
+body[lang="en"],
+body[lang="vi"] {
   bili-comments::part(options) {
     width: 200px;
   }
@@ -59,6 +73,15 @@ body[lang="en"] {
   }
   .media-session-help {
     width: 418px;
+  }
+}
+body[lang="vi"] {
+  .app_video--detail-unfold:after {
+    content: 'Mở rộng';
+  }
+
+  .app_video--detail.app_video--unfold .app_video--detail-unfold:after {
+    content: 'Thu gọn';
   }
 }
 @media (max-width: 1040px) {

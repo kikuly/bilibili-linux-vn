@@ -8,7 +8,7 @@ import playSlice, { playSyncState } from "./play.ts";
 import danmakuSlice, { danmakuSyncState } from "./danmaku.ts";
 import roamingSlice, { roamingSyncState } from "./roaming.ts";
 import { requestContent } from "../../document/communication.ts";
-import { languageDocument, normalizeLanguage } from "../../common/translation/language.ts";
+import { firstRunLanguage, languageDocument, normalizeLanguage } from "../../common/translation/language.ts";
 import i18n from "../i18n.ts";
 
 // slice actions映射，用于多slice数据同步
@@ -110,7 +110,8 @@ export function initStore() {
       if (languageRevision !== revision) return
       isSyncing = true
       try {
-        store.dispatch(storageSync({ lang: normalizeLanguage(language) }))
+        // 从未选择过语言时使用默认语言
+        store.dispatch(storageSync({ lang: language ? normalizeLanguage(language) : firstRunLanguage }))
       } finally {
         isSyncing = false
       }

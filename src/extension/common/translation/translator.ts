@@ -1,4 +1,5 @@
 import { enSimple, enRules } from './en'
+import { viSimple, viRules } from './vi'
 import { defaultLanguage, type Language } from './language'
 
 export interface TranslationRule {
@@ -6,15 +7,22 @@ export interface TranslationRule {
   translation: string | ((parameters: Record<string, string>) => string)
 }
 
+const dictionaries: Partial<Record<Language, { simple: Record<string, string>, rules: readonly TranslationRule[] }>> = {
+  en: { simple: enSimple, rules: enRules },
+  vi: { simple: viSimple, rules: viRules },
+}
+
 export function translateText(source: string, language: Language): string {
   if (language === defaultLanguage) return source
+  const dictionary = dictionaries[language]
+  if (!dictionary) return source
   const key = source.trim()
   if (!key) return source
   let translated: string | undefined
-  if (Object.hasOwn(enSimple, key)) {
-    translated = enSimple[key]
+  if (Object.hasOwn(dictionary.simple, key)) {
+    translated = dictionary.simple[key]
   } else {
-    for (const rule of enRules) {
+    for (const rule of dictionary.rules) {
       const match = rule.pattern.exec(key)
       if (!match) continue
       const parameters = match.groups || {}
