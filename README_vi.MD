@@ -50,16 +50,26 @@ Tải ở trang Release: **https://github.com/kikuly/bilibili-linux-vn/releases*
 | Hệ điều hành | Tệp | Ghi chú |
 |---|---|---|
 | Windows x64 | `bilibili-vi-1.19.0-x64.exe` | Trình cài đặt NSIS, cho phép chọn thư mục cài. Tệp chưa được ký số nên Windows SmartScreen có thể cảnh báo ("More info" → "Run anyway"). |
-| Linux x64 | `bilibili-v1.19.0-vi.1-x64.tar.gz` | Giải nén rồi chạy `bin/bilibili`. Đã gồm sẵn Electron 43.1.1. |
+| Linux x64 (AppImage) | `bilibili-vi-1.19.0-x86_64.AppImage` | Chạy trực tiếp trên hầu hết các bản phân phối. Cần quyền thực thi; nếu thiếu FUSE thì chạy với `--appimage-extract-and-run`. |
+| Linux x64 (rpm) | `bilibili-vi-1.19.0.x86_64.rpm` | Cho Fedora, openSUSE và các bản phân phối dùng rpm; cài vào `/opt/bilibili`. |
+| Linux x64 (tar.gz) | `bilibili-v1.19.0-vi.1-x64.tar.gz` | Giải nén rồi chạy `bin/bilibili`. Đã gồm sẵn Electron 43.1.1. |
 
 Linux:
 
 ```bash
+# AppImage
+chmod +x bilibili-vi-1.19.0-x86_64.AppImage
+./bilibili-vi-1.19.0-x86_64.AppImage
+
+# rpm (Fedora, openSUSE, ...)
+sudo dnf install ./bilibili-vi-1.19.0.x86_64.rpm
+
+# hoặc dùng tar.gz
 tar xzf bilibili-v1.19.0-vi.1-x64.tar.gz
 ./bin/bilibili
 ```
 
-> Bản Windows đã được chạy thử. Bản Linux được đóng gói theo đúng cấu trúc của dự án gốc nhưng **chưa được chạy thử trên máy Linux thật**; nếu gặp lỗi xin mở issue.
+> Bản Windows đã được chạy thử. Các gói Linux được dựng trong container Linux và mới chỉ kiểm tra được ở mức giải nén và khởi chạy mã của ứng dụng; **chưa được chạy thử có giao diện trên máy Linux thật**. Nếu gặp lỗi xin mở issue.
 
 Nếu không muốn cài thêm một bản Electron, có thể lấy `app/app.asar` trong gói Linux và chạy bằng Electron đã có sẵn (khuyến nghị `43.1.1`).
 
